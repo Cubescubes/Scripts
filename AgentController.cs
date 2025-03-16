@@ -1,60 +1,75 @@
 using UnityEngine;
 using UnityEngine.AI;
-
+using System.Collections;
+using System.Collections.Generic;
 public class AgentController : MonoBehaviour
 {
 
-public GameObject MainCamera; // Ссылка на цель
+    private float JumpHeight = 5.0f;
+    private Rigidbody rb;
+    public bool groundedPlayer = true;
+    private float groundRadius = 0.3f;
+    private Transform groundCheck;
+    public LayerMask groundMask; 
 
-Vector3 Dir = Vector3.zero;
+    public Transform player;
+    
+
+    private float gravityValue = -9.8f;
+
+public GameObject MainCamera; //Ссылка на цель
 
 private NavMeshAgent agent;
+
+Vector3 Dir = Vector3.zero;
 
 private float speed;
 
 private float currentspeed;
 
+
 void Start(){
     agent = GetComponent<NavMeshAgent>();
+    Cursor.visible = false;
 }
-
 void Update()
 {
-    Dir = Vector3.Normalize(MainCamera.transform.forward);
-    Debug.Log(Dir);
+    //isGrounded = Physics.OverlapSphere();
+
+if (Input.GetButtonDown("Jump") && groundedPlayer)
+        {
+            groundedPlayer = false;
+            agent.enabled = false;
+            player.position=new Vector3(player.position.x,player.position.y+Mathf.Sqrt(JumpHeight * -3.0f * gravityValue),player.position.z);
+
+        }
+        if ()
+         player.position=new Vector3(player.position.x,player.position.y+gravityValue * Time.deltaTime,player.position.z);
     Vector3 offset = new Vector3();
 // Задаем цель для агента
     //offset = GetBaseInput()* agent.speed * Time.deltaTime;
     //Debug.Log(!GetBaseInput().Equals(Vector3.zero));
-    if( !GetBaseInput().Equals(Vector3.zero) ){
-    offset =  GetBaseInput() * agent.speed * Time.deltaTime;
-    
-    //Debug.Log(Dir + GetBaseInput());
-    //cameraInput();
-    //Debug.Log(Input.mousePosition); 
-    }
-    offset =  Dir * agent.speed * Time.deltaTime;
+     offset =  GetBaseInput() * agent.speed * Time.deltaTime;
+     if (agent.enabled == true){
     agent.Move(offset);
+     }
 }
 private Vector3 GetBaseInput(){
 
 Vector3 destination = new Vector3();
 
 if (Input.GetKey (KeyCode.W)){ 
-            destination += Vector3.forward;              
+            destination += MainCamera.transform.forward;
         } 
 if (Input.GetKey (KeyCode.S)){ 
-            destination += new Vector3(0, 0, -1); 
+            destination += MainCamera.transform.forward * -1; 
         } 
 if (Input.GetKey (KeyCode.A)){ 
-            destination += new Vector3(-1, 0, 0); 
+            destination += -MainCamera.transform.right; 
         } 
 if (Input.GetKey (KeyCode.D)){ 
-            destination += new Vector3(1, 0, 0); 
+            destination += MainCamera.transform.right; 
         } 
 return destination;
 }
-
-
-
 }
